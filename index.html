@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Monty Hall — pick a door</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@500;700;800&family=Karla:ital,wght@0,400;0,600;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --backdrop:#0D1A20;
+  --stage:#12252D;
+  --curtain:#7B2B33;
+  --curtain-lit:#9A3A42;
+  --brass:#D6A03C;
+  --brass-dim:#8A6825;
+  --cream:#F3E9D6;
+  --slate:#8FA3AE;
+  --mint:#4FA88B;
+  --rule:rgba(243,233,214,.16);
+  --display:"Big Shoulders Display","Haettenschweiler","Arial Narrow",sans-serif;
+  --body:"Karla","Helvetica Neue",Arial,sans-serif;
+  --mono:"Space Mono",ui-monospace,Menlo,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--backdrop);
+  color:var(--cream);
+  font-family:var(--body);
+  font-size:16px;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1060px;margin:0 auto;padding:0 20px 72px}
+
+/* ---------- marquee ---------- */
+.marquee{
+  position:relative;
+  margin:0 -20px 0;
+  padding:34px 20px 26px;
+  background:
+    radial-gradient(120% 140% at 50% -30%, rgba(214,160,60,.16) 0%, rgba(214,160,60,0) 62%),
+    var(--stage);
+  border-bottom:1px solid var(--rule);
+  text-align:center;
+}
+.bulbs{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin-bottom:22px}
+.bulb{
+  width:9px;height:9px;border-radius:50%;
+  background:var(--brass-dim);
+  box-shadow:0 0 0 2px rgba(214,160,60,.12);
+  animation:glow 2.4s ease-in-out infinite;
+}
+@keyframes glow{0%,100%{background:var(--brass-dim);box-shadow:0 0 0 2px rgba(214,160,60,.10)}
+50%{background:var(--brass);box-shadow:0 0 10px 2px rgba(214,160,60,.45)}}
+.bulbs.chase .bulb{animation-duration:.55s}
+h1{
+  font-family:var(--display);
+  font-weight:800;
+  font-size:clamp(52px,11vw,124px);
+  line-height:.82;
+  letter-spacing:.01em;
+  margin:0;
+  text-transform:uppercase;
+  color:var(--cream);
+}
+h1 .sub{display:block;font-size:.28em;font-weight:500;letter-spacing:.42em;color:var(--brass);margin-top:16px}
+.tagline{
+  font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--slate);margin:18px 0 0;
+}
+
+/* ---------- stage ---------- */
+.stage{
+  margin-top:44px;
+  padding:38px 26px 30px;
+  border:1px solid var(--rule);
+  border-radius:2px;
+  background:
+    linear-gradient(180deg, rgba(214,160,60,.06) 0%, rgba(214,160,60,0) 40%),
+    var(--stage);
+}
+.callout{
+  font-family:var(--display);
+  font-size:clamp(22px,3.4vw,34px);
+  font-weight:700;
+  line-height:1.15;
+  text-transform:uppercase;
+  letter-spacing:.02em;
+  margin:0 0 30px;
+  min-height:2.3em;
+  text-align:center;
+  color:var(--cream);
+}
+.callout em{font-style:normal;color:var(--brass)}
+.doors{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;perspective:1400px}
+.door{
+  position:relative;
+  aspect-ratio:3/4.4;
+  border:1px solid rgba(243,233,214,.12);
+  background:#0A1419;
+  overflow:hidden;
+}
+.reveal{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
+  background:radial-gradient(90% 70% at 50% 40%, rgba(214,160,60,.22) 0%, rgba(10,20,25,0) 70%);
+  opacity:0;visibility:hidden;
+  transition:opacity .3s ease .28s, visibility 0s linear .28s;
+}
+.door.open .reveal{opacity:1;visibility:visible;transition:opacity .3s ease .28s}
+.reveal svg{width:58%;max-width:150px;height:auto}
+.reveal span{
+  font-family:var(--mono);font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--brass);
+}
+.face{
+  position:absolute;inset:0;
+  border:0;padding:0;
+  display:flex;align-items:flex-start;justify-content:center;
+  background:
+    repeating-linear-gradient(90deg, rgba(0,0,0,.22) 0 2px, rgba(0,0,0,0) 2px 13px),
+    linear-gradient(180deg, var(--curtain-lit), var(--curtain) 55%, #5E1F26);
+  color:var(--cream);
+  font-family:var(--display);
+  font-size:clamp(46px,7vw,76px);
+  font-weight:800;
+  line-height:1;
+  padding-top:14%;
+  cursor:pointer;
+  transform-origin:left center;
+  transition:transform .7s cubic-bezier(.32,.72,.3,1), filter .25s ease;
+  outline-offset:4px;
+}
+.face::after{
+  content:"";position:absolute;right:9%;top:52%;width:9px;height:9px;border-radius:50%;
+  background:var(--brass);opacity:.85;
+}
+.door.live .face:hover,.door.live .face:focus-visible{box-shadow:inset 0 0 0 3px var(--brass)}
+.door.open .face{transform:rotateY(-112deg)}
+.door.picked{outline:2px solid var(--brass);outline-offset:3px}
+.door.picked .face::before{
+  content:"your pick";
+  position:absolute;left:0;right:0;bottom:12%;
+  font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--brass);
+}
+
+/* ---------- controls ---------- */
+.controls{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-top:32px;min-height:52px}
+button{
+  font-family:var(--display);
+  font-size:22px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  padding:11px 26px;
+  color:var(--cream);
+  background:transparent;
+  border:1px solid rgba(243,233,214,.35);
+  border-radius:1px;
+  cursor:pointer;
+  transition:background .18s ease,color .18s ease,border-color .18s ease;
+}
+button:hover{background:rgba(243,233,214,.1)}
+button:focus-visible{outline:2px solid var(--brass);outline-offset:3px}
+button.hot{background:var(--brass);border-color:var(--brass);color:#221703}
+button.hot:hover{background:#E7B04A}
+button[hidden]{display:none}
+
+/* ---------- data ---------- */
+.data{margin-top:64px}
+.eyebrow{
+  font-family:var(--mono);font-size:12px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--slate);margin:0 0 18px;padding-bottom:10px;border-bottom:1px solid var(--rule);
+}
+.scores{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:22px}
+.score{border-left:2px solid var(--slate);padding:4px 0 4px 16px}
+.score.switch{border-left-color:var(--brass)}
+.score h3{
+  font-family:var(--mono);font-size:12px;font-weight:400;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--slate);margin:0 0 6px;
+}
+.score .pct{font-family:var(--display);font-size:56px;font-weight:800;line-height:.9;display:block}
+.score.switch .pct{color:var(--brass)}
+.score .note{font-family:var(--mono);font-size:12px;color:var(--slate);margin:8px 0 0}
+.chartbox{margin-top:38px;border:1px solid var(--rule);padding:18px 16px 10px;background:var(--stage)}
+canvas{width:100%;height:260px;display:block}
+.legend{display:flex;gap:22px;flex-wrap:wrap;margin-top:10px;font-family:var(--mono);font-size:12px;color:var(--slate)}
+.legend i{display:inline-block;width:16px;height:2px;vertical-align:middle;margin-right:8px}
+
+.simbar{display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-top:26px}
+.simbar label{font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--slate)}
+.simbar select{
+  font-family:var(--mono);font-size:14px;color:var(--cream);background:var(--backdrop);
+  border:1px solid rgba(243,233,214,.35);border-radius:1px;padding:11px 12px;cursor:pointer;
+}
+.simbar select:focus-visible{outline:2px solid var(--brass);outline-offset:3px}
+
+/* ---------- rules panel ---------- */
+.explain{margin-top:48px;border-top:1px solid var(--rule)}
+.explain summary{
+  font-family:var(--display);font-size:24px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;
+  padding:16px 0;cursor:pointer;color:var(--brass);list-style:none;
+}
+.explain summary::-webkit-details-marker{display:none}
+.explain summary::after{content:" +";font-family:var(--mono);font-size:18px;color:var(--slate)}
+.explain[open] summary::after{content:" \2212"}
+.explain summary:focus-visible{outline:2px solid var(--brass);outline-offset:3px}
+.rules{margin-top:8px;display:grid;grid-template-columns:1fr;gap:26px;padding-bottom:8px}
+@media(min-width:820px){.rules{grid-template-columns:1.1fr .9fr}}
+footer{margin-top:40px;font-family:var(--mono);font-size:11px;color:var(--slate);letter-spacing:.06em}
+
+}
+.panel{border:1px solid var(--rule);padding:22px 24px;background:var(--stage)}
+.panel h2{font-family:var(--display);font-size:30px;font-weight:700;text-transform:uppercase;letter-spacing:.02em;margin:0 0 12px}
+.panel p{margin:0 0 14px;color:rgba(243,233,214,.82);font-size:15px}
+.panel p:last-child{margin-bottom:0}
+.switcher{display:flex;flex-direction:column;gap:12px;margin-top:6px}
+.opt{display:flex;gap:12px;align-items:flex-start;cursor:pointer;padding:12px 14px;border:1px solid var(--rule)}
+.opt:hover{background:rgba(243,233,214,.05)}
+.opt input{margin:5px 0 0;accent-color:var(--brass);flex:none}
+.opt strong{display:block;font-weight:600;font-size:15px}
+.opt span{font-size:13px;color:var(--slate);line-height:1.5}
+.opt.on{border-color:var(--brass)}
+
+@media(max-width:700px){
+  body{font-size:15px}
+  .wrap{padding:0 14px 40px}
+  .marquee{margin:0;padding:16px 14px 14px}
+  .bulbs{gap:9px;margin-bottom:12px}
+  .bulb{width:7px;height:7px}
+  .bulb:nth-child(n+13){display:none}
+  h1{font-size:36px;line-height:.9}
+  h1 .sub{font-size:.3em;letter-spacing:.28em;margin-top:9px}
+  .tagline{display:none}
+  .stage{margin-top:14px;padding:14px 10px 12px}
+  .callout{font-size:18px;line-height:1.2;margin:0 0 14px;min-height:3.4em}
+  .doors{gap:8px}
+  .door{aspect-ratio:5/7}
+  .face{font-size:34px;padding-top:11%}
+  .face::after{width:6px;height:6px;right:8%}
+  .door.picked .face::before{font-size:9px;letter-spacing:.12em;bottom:8%}
+  .reveal svg{width:64%}
+  .reveal span{font-size:10px;letter-spacing:.14em}
+  .controls{gap:10px;margin-top:16px;min-height:46px}
+  button{font-size:18px;padding:10px 16px;min-height:44px}
+  .data{margin-top:34px}
+  .scores{grid-template-columns:1fr 1fr;gap:14px}
+  .score{padding-left:11px}
+  .score:last-child{grid-column:1/-1}
+  .score .pct{font-size:34px}
+  .score h3{font-size:11px;letter-spacing:.12em}
+  .score .note{font-size:11px}
+  .chartbox{margin-top:22px;padding:12px 8px 6px}
+  canvas{height:170px}
+  .legend{gap:14px;font-size:11px}
+  .simbar{gap:10px;margin-top:18px}
+  .simbar select{padding:10px;min-height:44px}
+  .explain{margin-top:30px}
+  .explain summary{font-size:20px}
+  .panel{padding:16px 15px}
+  .panel h2{font-size:22px}
+  .panel p{font-size:14px}
+}
+@media(max-width:360px){
+  h1{font-size:31px}
+  .face{font-size:28px}
+  button{font-size:16px;padding:10px 13px}
+@media(prefers-reduced-motion:reduce){
+  *{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
+}
+</style>
+</head>
+<body>
+
+<header class="marquee">
+  <div class="bulbs" id="bulbs" aria-hidden="true"></div>
+  <h1>Monty Hall<span class="sub">three doors, one car</span></h1>
+  <p class="tagline">Play it · simulate it · then argue about it</p>
+</header>
+
+<main class="wrap">
+
+  <section class="stage" aria-label="The game">
+    <p class="callout" id="callout" role="status" aria-live="polite">Pick a door.</p>
+
+    <div class="doors" id="doors"></div>
+
+    <div class="controls">
+      <button id="btn-stay" hidden>Stay</button>
+      <button id="btn-switch" class="hot" hidden>Switch</button>
+      <button id="btn-again" hidden>Play again</button>
+    </div>
+  </section>
+
+  <section class="data" aria-label="Results so far">
+    <p class="eyebrow">Running tally</p>
+    <div class="scores">
+      <div class="score stay">
+        <h3>Stayed</h3>
+        <span class="pct" id="stay-pct">—</span>
+        <p class="note" id="stay-note">0 rounds</p>
+      </div>
+      <div class="score switch">
+        <h3>Switched</h3>
+        <span class="pct" id="switch-pct">—</span>
+        <p class="note" id="switch-note">0 rounds</p>
+      </div>
+      <div class="score">
+        <h3>Spoiled by host</h3>
+        <span class="pct" id="void-count">0</span>
+        <p class="note">Rounds where a random host opened the car</p>
+      </div>
+    </div>
+
+    <div class="chartbox">
+      <canvas id="chart" aria-label="Win rate of each strategy as rounds accumulate"></canvas>
+      <div class="legend">
+        <span><i style="background:#D6A03C"></i>Switch</span>
+        <span><i style="background:#8FA3AE"></i>Stay</span>
+        <span><i style="background:rgba(243,233,214,.3)"></i>1/3 and 2/3</span>
+      </div>
+    </div>
+
+    <div class="simbar">
+      <label for="sim-n">Rounds</label>
+      <select id="sim-n">
+        <option value="100">100</option>
+        <option value="1000" selected>1,000</option>
+        <option value="10000">10,000</option>
+      </select>
+      <button id="btn-sim-stay">Always stay</button>
+      <button id="btn-sim-switch" class="hot">Always switch</button>
+      <button id="btn-sim-both">Both</button>
+      <button id="btn-reset">Reset tally</button>
+    </div>
+  </section>
+
+  <details class="explain" id="explain" open>
+    <summary>Why switching wins — and when it doesn't</summary>
+    <div class="rules">
+    <div class="panel">
+      <h2>The host is the whole trick</h2>
+      <p>The doors don't move probability around — the host does. When he knows where the car is and is barred from opening it, the door he leaves closed carries the full 2/3 that wasn't yours to begin with.</p>
+      <p>Take that knowledge away and the advantage evaporates. A host opening a door at random sometimes exposes the car; throw those rounds out, and the ones that survive split 50/50. Same three doors, same footage, different answer.</p>
+      <p>Switch the rule below and run the simulation twice. The gap between the two curves is the value of the host's information.</p>
+    </div>
+    <div class="panel">
+      <h2>Host rule</h2>
+      <div class="switcher" id="switcher">
+        <label class="opt on"><input type="radio" name="host" value="knows" checked>
+          <span><strong>Host knows</strong><span>Always opens a goat door you didn't pick. The classic puzzle.</span></span></label>
+        <label class="opt"><input type="radio" name="host" value="random">
+          <span><strong>Host guesses</strong><span>Opens either unpicked door at random. Sometimes reveals the car and spoils the round.</span></span></label>
+      </div>
+    </div>
+    </div>
+  </details>
+
+  <footer>Open the file in any browser — nothing loads except the fonts.</footer>
+</main>
+
+<script>
+(function(){
+  "use strict";
+
+  var CAR = '<svg viewBox="0 0 120 64" fill="none" stroke="#D6A03C" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M6 44h108"/><path d="M12 44V32l14-18h50l20 18h12a6 6 0 0 1 6 6v6"/><path d="M40 14v18M70 14l16 18M12 32h96"/><circle cx="34" cy="46" r="9"/><circle cx="88" cy="46" r="9"/></svg>';
+  var GOAT = '<svg viewBox="0 0 120 84" fill="none" stroke="#D6A03C" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M42 26c-8-4-14-12-14-20 10 2 18 8 22 16"/><path d="M78 26c8-4 14-12 14-20-10 2-18 8-22 16"/><path d="M40 30h40c8 0 14 6 14 14v6c0 10-8 18-18 18H44c-10 0-18-8-18-18v-6c0-8 6-14 14-14Z"/><path d="M52 46h.01M76 46h.01"/><path d="M58 68l4 12 4-12"/></svg>';
+
+  var doorsEl = document.getElementById('doors');
+  var callout = document.getElementById('callout');
+  var bStay = document.getElementById('btn-stay');
+  var bSwitch = document.getElementById('btn-switch');
+  var bAgain = document.getElementById('btn-again');
+  var bulbs = document.getElementById('bulbs');
+  var canvas = document.getElementById('chart');
+  var ctx = canvas.getContext('2d');
+
+  for (var b = 0; b < 24; b++) {
+    var dot = document.createElement('span');
+    dot.className = 'bulb';
+    dot.style.animationDelay = (b * 0.1).toFixed(2) + 's';
+    bulbs.appendChild(dot);
+  }
+
+  var doors = [];
+  for (var i = 0; i < 3; i++) {
+    var d = document.createElement('div');
+    d.className = 'door';
+    d.innerHTML = '<div class="reveal"></div><button class="face" type="button" aria-label="Open door ' + (i + 1) + '">' + (i + 1) + '</button>';
+    doorsEl.appendChild(d);
+    doors.push(d);
+  }
+
+  var car = 0, picked = null, opened = null, phase = 'pick', spoiled = false;
+  var tally = { stay: { w: 0, n: 0 }, swap: { w: 0, n: 0 }, spoiled: 0 };
+  var hist = { stay: [], swap: [] };
+
+  function rnd(n) { return Math.floor(Math.random() * n); }
+  function hostKnows() { return document.querySelector('input[name=host]:checked').value === 'knows'; }
+  function show(el, on) { el.hidden = !on; }
+
+  function dressDoors() {
+    doors.forEach(function (d, k) {
+      var r = d.querySelector('.reveal');
+      r.innerHTML = (k === car ? CAR : GOAT) + '<span>' + (k === car ? 'the car' : 'a goat') + '</span>';
+    });
+  }
+
+  function newRound() {
+    car = rnd(3); picked = null; opened = null; spoiled = false; phase = 'pick';
+    doors.forEach(function (d) {
+      d.className = 'door live';
+      d.querySelector('.face').disabled = false;
+    });
+    dressDoors();
+    callout.textContent = 'Pick a door.';
+    show(bStay, false); show(bSwitch, false); show(bAgain, false);
+  }
+
+  function lockDoors() {
+    doors.forEach(function (d) {
+      d.classList.remove('live');
+      d.querySelector('.face').disabled = true;
+    });
+  }
+
+  function pick(k) {
+    if (phase !== 'pick') return;
+    picked = k; phase = 'reveal';
+    doors[k].classList.add('picked');
+    lockDoors();
+
+    var pool = [0, 1, 2].filter(function (x) { return x !== picked && (hostKnows() ? x !== car : true); });
+    opened = pool[rnd(pool.length)];
+    doors[opened].classList.add('open');
+
+    if (opened === car) {
+      spoiled = true; phase = 'done';
+      tally.spoiled++;
+      callout.innerHTML = 'The host opens door ' + (opened + 1) + ' and there\u2019s the car. <em>Round spoiled</em> \u2014 it doesn\u2019t count.';
+      paint(); show(bAgain, true);
+      return;
+    }
+    callout.innerHTML = 'Door ' + (opened + 1) + ': a goat. Keep door ' + (picked + 1) + ', or <em>switch</em>?';
+    bStay.textContent = 'Stay with ' + (picked + 1);
+    var other = [0, 1, 2].filter(function (x) { return x !== picked && x !== opened; })[0];
+    bSwitch.textContent = 'Switch to ' + (other + 1);
+    show(bStay, true); show(bSwitch, true);
+  }
+
+  function decide(sw) {
+    if (phase !== 'reveal') return;
+    phase = 'done';
+    var other = [0, 1, 2].filter(function (x) { return x !== picked && x !== opened; })[0];
+    var finalDoor = sw ? other : picked;
+    doors.forEach(function (d) { d.classList.add('open'); });
+    doors[finalDoor].classList.add('picked');
+
+    var key = sw ? 'swap' : 'stay';
+    var won = finalDoor === car;
+    tally[key].n++; if (won) tally[key].w++;
+    hist[key].push(tally[key].w / tally[key].n);
+
+    callout.innerHTML = won
+      ? 'Door ' + (finalDoor + 1) + ' \u2014 <em>you win the car</em>.'
+      : 'Door ' + (finalDoor + 1) + ' \u2014 a goat. The car was behind ' + (car + 1) + '.';
+    if (won) {
+      bulbs.classList.add('chase');
+      setTimeout(function () { bulbs.classList.remove('chase'); }, 2400);
+    }
+    paint();
+    show(bStay, false); show(bSwitch, false); show(bAgain, true);
+  }
+
+  function simulate(rounds, mode) {
+    var knows = hostKnows();
+    var keys = mode === 'both' ? ['stay', 'swap'] : [mode];
+    for (var t = 0; t < rounds; t++) {
+      keys.forEach(function (key) {
+        var c = rnd(3), p = rnd(3);
+        var pool = [0, 1, 2].filter(function (x) { return x !== p && (knows ? x !== c : true); });
+        var o = pool[rnd(pool.length)];
+        if (o === c) { tally.spoiled++; return; }
+        var other = [0, 1, 2].filter(function (x) { return x !== p && x !== o; })[0];
+        var fin = key === 'swap' ? other : p;
+        tally[key].n++; if (fin === c) tally[key].w++;
+        hist[key].push(tally[key].w / tally[key].n);
+      });
+    }
+    paint();
+  }
+
+  function paint() {
+    [['stay', 'stay'], ['swap', 'switch']].forEach(function (pair) {
+      var t = tally[pair[0]];
+      var pct = t.n ? (100 * t.w / t.n) : null;
+      document.getElementById(pair[1] + '-pct').textContent = pct === null ? '\u2014' : pct.toFixed(1) + '%';
+      document.getElementById(pair[1] + '-note').textContent =
+        t.n === 0 ? '0 rounds' : t.w + ' wins in ' + t.n + (t.n === 1 ? ' round' : ' rounds');
+    });
+    document.getElementById('void-count').textContent = tally.spoiled;
+    drawChart();
+  }
+
+  function drawChart() {
+    var dpr = window.devicePixelRatio || 1;
+    var w = canvas.clientWidth, h = canvas.clientHeight;
+    canvas.width = w * dpr; canvas.height = h * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, w, h);
+
+    var L = 44, R = 12, T = 12, B = 28;
+    var pw = w - L - R, ph = h - T - B;
+    var maxN = Math.max(hist.stay.length, hist.swap.length, 12);
+    var y = function (v) { return T + ph * (1 - v); };
+    var x = function (n) { return L + pw * (n / maxN); };
+
+    ctx.font = '11px "Space Mono", monospace';
+    ctx.fillStyle = 'rgba(143,163,174,.9)';
+    ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+    [[0, '0'], [1 / 3, '1/3'], [2 / 3, '2/3'], [1, '1']].forEach(function (g) {
+      ctx.strokeStyle = (g[0] === 1 / 3 || g[0] === 2 / 3) ? 'rgba(243,233,214,.30)' : 'rgba(243,233,214,.10)';
+      ctx.setLineDash(g[0] === 1 / 3 || g[0] === 2 / 3 ? [4, 5] : []);
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(L, y(g[0])); ctx.lineTo(w - R, y(g[0])); ctx.stroke();
+      ctx.fillText(g[1], L - 10, y(g[0]));
+    });
+    ctx.setLineDash([]);
+    ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+    ctx.fillText('rounds \u2192 ' + maxN, L + pw / 2, h - 16);
+
+    [['swap', '#D6A03C'], ['stay', '#8FA3AE']].forEach(function (s) {
+      var arr = hist[s[0]];
+      if (arr.length < 2) return;
+      var step = Math.max(1, Math.floor(arr.length / 900));
+      ctx.strokeStyle = s[1]; ctx.lineWidth = 2; ctx.lineJoin = 'round';
+      ctx.beginPath();
+      for (var k = 0; k < arr.length; k += step) {
+        var px = x(k + 1), py = y(arr[k]);
+        if (k === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+      }
+      ctx.lineTo(x(arr.length), y(arr[arr.length - 1]));
+      ctx.stroke();
+    });
+  }
+
+  doors.forEach(function (d, k) {
+    d.querySelector('.face').addEventListener('click', function () { pick(k); });
+  });
+  bStay.addEventListener('click', function () { decide(false); });
+  bSwitch.addEventListener('click', function () { decide(true); });
+  bAgain.addEventListener('click', newRound);
+  function simRounds() { return parseInt(document.getElementById('sim-n').value, 10); }
+  document.getElementById('btn-sim-stay').addEventListener('click', function () { simulate(simRounds(), 'stay'); });
+  document.getElementById('btn-sim-switch').addEventListener('click', function () { simulate(simRounds(), 'swap'); });
+  document.getElementById('btn-sim-both').addEventListener('click', function () { simulate(simRounds(), 'both'); });
+  document.getElementById('btn-reset').addEventListener('click', function () {
+    tally = { stay: { w: 0, n: 0 }, swap: { w: 0, n: 0 }, spoiled: 0 };
+    hist = { stay: [], swap: [] };
+    newRound(); paint();
+  });
+  document.getElementById('switcher').addEventListener('change', function () {
+    document.querySelectorAll('.opt').forEach(function (o) {
+      o.classList.toggle('on', o.querySelector('input').checked);
+    });
+    tally = { stay: { w: 0, n: 0 }, swap: { w: 0, n: 0 }, spoiled: 0 };
+    hist = { stay: [], swap: [] };
+    newRound(); paint();
+  });
+  window.addEventListener('resize', drawChart);
+
+  if (window.matchMedia('(max-width:700px)').matches) {
+    document.getElementById('explain').open = false;
+  }
+
+  newRound();
+  paint();
+})();
+</script>
+</body>
+</html>
