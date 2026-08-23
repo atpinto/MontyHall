@@ -182,9 +182,9 @@ button[hidden]{display:none}
 .score .pct{font-family:var(--display);font-size:56px;font-weight:800;line-height:.9;display:block}
 .score.switch .pct{color:var(--brass)}
 .score .note{font-family:var(--mono);font-size:12px;color:var(--slate);margin:8px 0 0}
-.chartbox{margin-top:38px;border:1px solid var(--rule);padding:18px 16px 10px;background:var(--stage)}
-canvas{width:100%;height:260px;display:block}
-.legend{display:flex;gap:22px;flex-wrap:wrap;margin-top:10px;font-family:var(--mono);font-size:12px;color:var(--slate)}
+.chartbox{margin-top:24px;border:1px solid var(--rule);padding:12px 12px 8px;background:var(--stage);max-width:760px}
+canvas{width:100%;height:150px;display:block}
+.legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:8px;font-family:var(--mono);font-size:11px;color:var(--slate)}
 .legend i{display:inline-block;width:16px;height:2px;vertical-align:middle;margin-right:8px}
 
 .simbar{display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-top:26px}
@@ -233,8 +233,8 @@ footer{margin-top:40px;font-family:var(--mono);font-size:11px;color:var(--slate)
   h1 .sub{font-size:.32em;letter-spacing:.24em;margin-top:5px}
   .tagline{display:none}
   .stage{margin-top:9px;padding:9px 10px 10px}
-  .callout{font-size:14px;line-height:1.25;margin:0 0 8px;min-height:1.5em}
-  .doors{gap:6px;max-width:80%}
+  .callout{font-size:14px;line-height:1.25;margin:0 0 8px;min-height:2.5em}
+  .doors{gap:6px;max-width:50%}
   .door{aspect-ratio:5/7}
   .face{font-size:17px;padding-top:10%}
   .face::after{width:4px;height:4px;right:8%}
@@ -246,12 +246,11 @@ footer{margin-top:40px;font-family:var(--mono);font-size:11px;color:var(--slate)
   .data{margin-top:34px}
   .scores{grid-template-columns:1fr 1fr;gap:14px}
   .score{padding-left:11px}
-  .score:last-child{grid-column:1/-1}
   .score .pct{font-size:34px}
   .score h3{font-size:11px;letter-spacing:.12em}
   .score .note{font-size:11px}
-  .chartbox{margin-top:22px;padding:12px 8px 6px}
-  canvas{height:170px}
+  .chartbox{margin-top:16px;padding:9px 7px 5px}
+  canvas{height:110px}
   .legend{gap:14px;font-size:11px}
   .simbar{gap:10px;margin-top:18px}
   .simbar select{padding:10px;min-height:44px}
@@ -304,11 +303,6 @@ footer{margin-top:40px;font-family:var(--mono);font-size:11px;color:var(--slate)
         <h3>Switched</h3>
         <span class="pct" id="switch-pct">—</span>
         <p class="note" id="switch-note">0 rounds</p>
-      </div>
-      <div class="score">
-        <h3>Spoiled by host</h3>
-        <span class="pct" id="void-count">0</span>
-        <p class="note">Rounds where a random host opened the car</p>
       </div>
     </div>
 
@@ -498,7 +492,6 @@ footer{margin-top:40px;font-family:var(--mono);font-size:11px;color:var(--slate)
       document.getElementById(pair[1] + '-note').textContent =
         t.n === 0 ? '0 rounds' : t.w + ' wins in ' + t.n + (t.n === 1 ? ' round' : ' rounds');
     });
-    document.getElementById('void-count').textContent = tally.spoiled;
     drawChart();
   }
 
@@ -509,13 +502,13 @@ footer{margin-top:40px;font-family:var(--mono);font-size:11px;color:var(--slate)
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, w, h);
 
-    var L = 44, R = 12, T = 12, B = 28;
+    var L = 34, R = 10, T = 9, B = 20;
     var pw = w - L - R, ph = h - T - B;
     var maxN = Math.max(hist.stay.length, hist.swap.length, 12);
     var y = function (v) { return T + ph * (1 - v); };
     var x = function (n) { return L + pw * (n / maxN); };
 
-    ctx.font = '11px "Space Mono", monospace';
+    ctx.font = '10px "Space Mono", monospace';
     ctx.fillStyle = 'rgba(143,163,174,.9)';
     ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
     [[0, '0'], [1 / 3, '1/3'], [2 / 3, '2/3'], [1, '1']].forEach(function (g) {
@@ -523,11 +516,11 @@ footer{margin-top:40px;font-family:var(--mono);font-size:11px;color:var(--slate)
       ctx.setLineDash(g[0] === 1 / 3 || g[0] === 2 / 3 ? [4, 5] : []);
       ctx.lineWidth = 1;
       ctx.beginPath(); ctx.moveTo(L, y(g[0])); ctx.lineTo(w - R, y(g[0])); ctx.stroke();
-      ctx.fillText(g[1], L - 10, y(g[0]));
+      ctx.fillText(g[1], L - 7, y(g[0]));
     });
     ctx.setLineDash([]);
     ctx.textAlign = 'center'; ctx.textBaseline = 'top';
-    ctx.fillText('rounds \u2192 ' + maxN, L + pw / 2, h - 16);
+    ctx.fillText('rounds \u2192 ' + maxN, L + pw / 2, h - 13);
 
     [['swap', '#D6A03C'], ['stay', '#8FA3AE']].forEach(function (s) {
       var arr = hist[s[0]];
