@@ -39,16 +39,16 @@ body{
 .marquee{
   position:relative;
   margin:0 -20px 0;
-  padding:34px 20px 26px;
+  padding:17px 20px 13px;
   background:
     radial-gradient(120% 140% at 50% -30%, rgba(214,160,60,.16) 0%, rgba(214,160,60,0) 62%),
     var(--stage);
   border-bottom:1px solid var(--rule);
   text-align:center;
 }
-.bulbs{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin-bottom:22px}
+.bulbs{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-bottom:11px}
 .bulb{
-  width:9px;height:9px;border-radius:50%;
+  width:7px;height:7px;border-radius:50%;
   background:var(--brass-dim);
   box-shadow:0 0 0 2px rgba(214,160,60,.12);
   animation:glow 2.4s ease-in-out infinite;
@@ -59,23 +59,23 @@ body{
 h1{
   font-family:var(--display);
   font-weight:800;
-  font-size:clamp(52px,11vw,124px);
-  line-height:.82;
+  font-size:clamp(30px,5.5vw,62px);
+  line-height:.86;
   letter-spacing:.01em;
   margin:0;
   text-transform:uppercase;
   color:var(--cream);
 }
-h1 .sub{display:block;font-size:.28em;font-weight:500;letter-spacing:.42em;color:var(--brass);margin-top:16px}
+h1 .sub{display:block;font-size:.3em;font-weight:500;letter-spacing:.38em;color:var(--brass);margin-top:8px}
 .tagline{
   font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;
-  color:var(--slate);margin:18px 0 0;
+  color:var(--slate);margin:9px 0 0;
 }
 
 /* ---------- stage ---------- */
 .stage{
-  margin-top:44px;
-  padding:38px 26px 30px;
+  margin-top:24px;
+  padding:19px 26px 22px;
   border:1px solid var(--rule);
   border-radius:2px;
   background:
@@ -84,18 +84,18 @@ h1 .sub{display:block;font-size:.28em;font-weight:500;letter-spacing:.42em;color
 }
 .callout{
   font-family:var(--display);
-  font-size:clamp(22px,3.4vw,34px);
+  font-size:clamp(17px,2.3vw,23px);
   font-weight:700;
   line-height:1.15;
   text-transform:uppercase;
   letter-spacing:.02em;
-  margin:0 0 30px;
+  margin:0 0 15px;
   min-height:2.3em;
   text-align:center;
   color:var(--cream);
 }
 .callout em{font-style:normal;color:var(--brass)}
-.doors{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;perspective:1400px}
+.doors{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;perspective:1400px;max-width:48%;margin:0 auto}
 .door{
   position:relative;
   aspect-ratio:3/4.4;
@@ -105,15 +105,15 @@ h1 .sub{display:block;font-size:.28em;font-weight:500;letter-spacing:.42em;color
 }
 .reveal{
   position:absolute;inset:0;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;
   background:radial-gradient(90% 70% at 50% 40%, rgba(214,160,60,.22) 0%, rgba(10,20,25,0) 70%);
   opacity:0;visibility:hidden;
   transition:opacity .3s ease .28s, visibility 0s linear .28s;
 }
 .door.open .reveal{opacity:1;visibility:visible;transition:opacity .3s ease .28s}
-.reveal svg{width:58%;max-width:150px;height:auto}
+.reveal svg{width:62%;max-width:74px;height:auto}
 .reveal span{
-  font-family:var(--mono);font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--brass);
+  font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--brass);
 }
 .face{
   position:absolute;inset:0;
@@ -124,17 +124,17 @@ h1 .sub{display:block;font-size:.28em;font-weight:500;letter-spacing:.42em;color
     linear-gradient(180deg, var(--curtain-lit), var(--curtain) 55%, #5E1F26);
   color:var(--cream);
   font-family:var(--display);
-  font-size:clamp(46px,7vw,76px);
+  font-size:clamp(22px,3.4vw,37px);
   font-weight:800;
   line-height:1;
-  padding-top:14%;
+  padding-top:13%;
   cursor:pointer;
   transform-origin:left center;
   transition:transform .7s cubic-bezier(.32,.72,.3,1), filter .25s ease;
   outline-offset:4px;
 }
 .face::after{
-  content:"";position:absolute;right:9%;top:52%;width:9px;height:9px;border-radius:50%;
+  content:"";position:absolute;right:9%;top:52%;width:5px;height:5px;border-radius:50%;
   background:var(--brass);opacity:.85;
 }
 .door.live .face:hover,.door.live .face:focus-visible{box-shadow:inset 0 0 0 3px var(--brass)}
@@ -142,8 +142,8 @@ h1 .sub{display:block;font-size:.28em;font-weight:500;letter-spacing:.42em;color
 .door.picked{outline:2px solid var(--brass);outline-offset:3px}
 .door.picked .face::before{
   content:"your pick";
-  position:absolute;left:0;right:0;bottom:12%;
-  font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+  position:absolute;left:0;right:0;bottom:10%;
+  font-family:var(--mono);font-size:8px;letter-spacing:.08em;text-transform:uppercase;
   color:var(--brass);
 }
 
@@ -225,22 +225,22 @@ footer{margin-top:40px;font-family:var(--mono);font-size:11px;color:var(--slate)
 @media(max-width:700px){
   body{font-size:15px}
   .wrap{padding:0 14px 40px}
-  .marquee{margin:0;padding:16px 14px 14px}
-  .bulbs{gap:9px;margin-bottom:12px}
-  .bulb{width:7px;height:7px}
-  .bulb:nth-child(n+13){display:none}
-  h1{font-size:36px;line-height:.9}
-  h1 .sub{font-size:.3em;letter-spacing:.28em;margin-top:9px}
+  .marquee{margin:0;padding:8px 14px 7px}
+  .bulbs{gap:8px;margin-bottom:6px}
+  .bulb{width:5px;height:5px}
+  .bulb:nth-child(n+11){display:none}
+  h1{font-size:25px;line-height:.92}
+  h1 .sub{font-size:.32em;letter-spacing:.24em;margin-top:5px}
   .tagline{display:none}
-  .stage{margin-top:14px;padding:14px 10px 12px}
-  .callout{font-size:18px;line-height:1.2;margin:0 0 14px;min-height:3.4em}
-  .doors{gap:8px}
+  .stage{margin-top:9px;padding:9px 10px 10px}
+  .callout{font-size:14px;line-height:1.25;margin:0 0 8px;min-height:1.5em}
+  .doors{gap:6px;max-width:80%}
   .door{aspect-ratio:5/7}
-  .face{font-size:34px;padding-top:11%}
-  .face::after{width:6px;height:6px;right:8%}
-  .door.picked .face::before{font-size:9px;letter-spacing:.12em;bottom:8%}
-  .reveal svg{width:64%}
-  .reveal span{font-size:10px;letter-spacing:.14em}
+  .face{font-size:17px;padding-top:10%}
+  .face::after{width:4px;height:4px;right:8%}
+  .door.picked .face::before{font-size:7px;letter-spacing:.04em;bottom:7%}
+  .reveal svg{width:66%}
+  .reveal span{font-size:7px;letter-spacing:.06em}
   .controls{gap:10px;margin-top:16px;min-height:46px}
   button{font-size:18px;padding:10px 16px;min-height:44px}
   .data{margin-top:34px}
@@ -262,8 +262,8 @@ footer{margin-top:40px;font-family:var(--mono);font-size:11px;color:var(--slate)
   .panel p{font-size:14px}
 }
 @media(max-width:360px){
-  h1{font-size:31px}
-  .face{font-size:28px}
+  h1{font-size:22px}
+  .face{font-size:15px}
   button{font-size:16px;padding:10px 13px}
 @media(prefers-reduced-motion:reduce){
   *{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
